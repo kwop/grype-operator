@@ -108,24 +108,20 @@ func TestConcurrentAccess(t *testing.T) {
 	var wg sync.WaitGroup
 
 	// Concurrent writes
-	for i := 0; i < 100; i++ {
-		wg.Add(1)
-		go func(n int) {
-			defer wg.Done()
-			digest := "sha256:" + string(rune('a'+n%26))
+	for i := range 100 {
+		wg.Go(func() {
+			digest := "sha256:" + string(rune('a'+i%26))
 			c.MarkScanned(digest)
 			c.ShouldScan(digest)
-		}(i)
+		})
 	}
 
 	// Concurrent reads + cleanup
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range 10 {
+		wg.Go(func() {
 			c.Size()
 			c.Cleanup()
-		}()
+		})
 	}
 
 	wg.Wait()

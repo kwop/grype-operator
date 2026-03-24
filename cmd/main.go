@@ -93,7 +93,8 @@ func main() {
 		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
 
 	// Grype operator flags
-	flag.StringVar(&excludeNamespaces, "exclude-namespaces", "kube-system", "Comma-separated list of namespace patterns to exclude")
+	flag.StringVar(&excludeNamespaces, "exclude-namespaces", "kube-system",
+		"Comma-separated list of namespace patterns to exclude")
 	flag.StringVar(&excludeImages, "exclude-images", "", "Comma-separated list of image patterns to exclude")
 	flag.StringVar(&scanTimeout, "scan-timeout", "5m", "Timeout for each Grype scan")
 	flag.StringVar(&cacheTTL, "cache-ttl", "24h", "TTL for the image scan cache")

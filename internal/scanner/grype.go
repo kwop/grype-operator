@@ -97,6 +97,13 @@ func (s *Scanner) Scan(ctx context.Context, imageRef string) ([]VulnItem, *Summa
 	return vulns, summary, nil
 }
 
+const (
+	SevCritical = "Critical"
+	SevHigh     = "High"
+	SevMedium   = "Medium"
+	SevLow      = "Low"
+)
+
 func parseMatches(matches []Match, minSeverity string) ([]VulnItem, *Summary) {
 	minLevel := severityLevel(minSeverity)
 	summary := &Summary{}
@@ -107,13 +114,13 @@ func parseMatches(matches []Match, minSeverity string) ([]VulnItem, *Summary) {
 
 		// Count all in summary
 		switch m.Vulnerability.Severity {
-		case "Critical":
+		case SevCritical:
 			summary.Critical++
-		case "High":
+		case SevHigh:
 			summary.High++
-		case "Medium":
+		case SevMedium:
 			summary.Medium++
-		case "Low":
+		case SevLow:
 			summary.Low++
 		default:
 			summary.Unknown++
@@ -143,13 +150,13 @@ func parseMatches(matches []Match, minSeverity string) ([]VulnItem, *Summary) {
 
 func severityLevel(s string) int {
 	switch s {
-	case "Critical":
+	case SevCritical:
 		return 4
-	case "High":
+	case SevHigh:
 		return 3
-	case "Medium":
+	case SevMedium:
 		return 2
-	case "Low":
+	case SevLow:
 		return 1
 	default:
 		return 0

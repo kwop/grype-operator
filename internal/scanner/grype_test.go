@@ -89,7 +89,7 @@ func TestParseMatches_MinSeverityFilter(t *testing.T) {
 
 	// Verify filtered vulns are correct
 	for _, v := range vulns {
-		if v.Severity != "Critical" && v.Severity != "High" {
+		if v.Severity != SevCritical && v.Severity != SevHigh {
 			t.Errorf("unexpected severity %q in filtered results", v.Severity)
 		}
 	}

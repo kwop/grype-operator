@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -92,10 +93,7 @@ func TestImageScanName(t *testing.T) {
 
 func TestImageScanName_LongImageTruncated(t *testing.T) {
 	// Create an image name longer than 230 chars
-	longImage := ""
-	for i := 0; i < 250; i++ {
-		longImage += "a"
-	}
+	longImage := strings.Repeat("a", 250)
 	name := imageScanName(longImage, "sha256:abcdef123456789")
 	// scan- (5) + 230 + - (1) + 12 = 248, well under 253
 	if len(name) > 253 {
