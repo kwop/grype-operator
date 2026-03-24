@@ -1,0 +1,9 @@
+apiVersion: security.paramedic.tech/v1alpha1
+kind: ImageScan
+metadata:
+  labels:
+    app.kubernetes.io/name: grype-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: imagescan-sample
+spec:
+  # TODO(user): Add fields here

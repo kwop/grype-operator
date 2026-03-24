@@ -1,0 +1,147 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  name: imagescans.security.paramedic.tech
+spec:
+  group: security.paramedic.tech
+  names:
+    kind: ImageScan
+    listKind: ImageScanList
+    plural: imagescans
+    singular: imagescan
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.image
+      name: Image
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.summary.critical
+      name: Critical
+      type: integer
+    - jsonPath: .status.summary.high
+      name: High
+      type: integer
+    - jsonPath: .status.summary.medium
+      name: Medium
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ImageScan is the Schema for the imagescans API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ImageScanSpec defines the desired state of ImageScan.
+            properties:
+              digest:
+                description: digest is the image digest (e.g. sha256:abc123...)
+                type: string
+              image:
+                description: image is the full image reference (e.g. nginx:1.25.3)
+                type: string
+              sourceNamespace:
+                description: sourceNamespace is the namespace of the pod that triggered
+                  this scan
+                type: string
+              sourcePod:
+                description: sourcePod is the name of the pod that triggered this
+                  scan
+                type: string
+            required:
+            - image
+            - sourceNamespace
+            - sourcePod
+            type: object
+          status:
+            description: ImageScanStatus defines the observed state of ImageScan.
+            properties:
+              lastScanTime:
+                description: lastScanTime is the timestamp of the last scan
+                format: date-time
+                type: string
+              phase:
+                description: 'phase indicates the current scan phase: Pending, Scanning,
+                  Completed, Failed'
+                type: string
+              summary:
+                description: summary contains vulnerability counts by severity
+                properties:
+                  critical:
+                    type: integer
+                  high:
+                    type: integer
+                  low:
+                    type: integer
+                  medium:
+                    type: integer
+                  unknown:
+                    type: integer
+                required:
+                - critical
+                - high
+                - low
+                - medium
+                - unknown
+                type: object
+              vulnerabilities:
+                description: vulnerabilities contains the list of discovered vulnerabilities
+                items:
+                  description: Vulnerability represents a single vulnerability found
+                    in an image.
+                  properties:
+                    fixedIn:
+                      description: fixedIn is the version that fixes this vulnerability
+                      type: string
+                    id:
+                      description: id is the CVE identifier (e.g. CVE-2024-12345)
+                      type: string
+                    package:
+                      description: pkg is the affected package name
+                      type: string
+                    severity:
+                      description: severity is the vulnerability severity (Critical,
+                        High, Medium, Low, Unknown)
+                      type: string
+                    version:
+                      description: version is the installed package version
+                      type: string
+                  required:
+                  - id
+                  - package
+                  - severity
+                  - version
+                  type: object
+                type: array
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
