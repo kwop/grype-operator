@@ -29,7 +29,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	securityv1alpha1 "github.com/kwop/grype-operator/api/v1alpha1"
 	"github.com/kwop/grype-operator/internal/cache"
@@ -138,10 +140,12 @@ func (r *PodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 }
 
 // SetupWithManager sets up the controller with the Manager.
+// Pod watcher is limited to 1 concurrent reconcile to avoid CRD creation storms.
 func (r *PodReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.Pod{}).
 		Named("pod-watcher").
+		WithOptions(controller.TypedOptions[reconcile.Request]{MaxConcurrentReconciles: 1}).
 		Complete(r)
 }
 

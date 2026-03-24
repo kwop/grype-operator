@@ -222,10 +222,11 @@ func main() {
 
 	// Setup ImageScan controller (processes pending scans)
 	if err := (&controller.ImageScanReconciler{
-		Client:  mgr.GetClient(),
-		Scheme:  mgr.GetScheme(),
-		Scanner: grypeScanner,
-		Cache:   imageCache,
+		Client:         mgr.GetClient(),
+		Scheme:         mgr.GetScheme(),
+		Scanner:        grypeScanner,
+		Cache:          imageCache,
+		MaxConcurrency: scanConcurrency,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "Failed to create controller", "controller", "ImageScan")
 		os.Exit(1)

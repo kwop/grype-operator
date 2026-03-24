@@ -23,7 +23,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	securityv1alpha1 "github.com/kwop/grype-operator/api/v1alpha1"
 	"github.com/kwop/grype-operator/internal/cache"
@@ -35,9 +37,10 @@ import (
 // ImageScanReconciler reconciles ImageScan objects by running Grype scans.
 type ImageScanReconciler struct {
 	client.Client
-	Scheme  *runtime.Scheme
-	Scanner *scanner.Scanner
-	Cache   *cache.ImageCache
+	Scheme         *runtime.Scheme
+	Scanner        *scanner.Scanner
+	Cache          *cache.ImageCache
+	MaxConcurrency int
 }
 
 // +kubebuilder:rbac:groups=security.paramedic.tech,resources=imagescans,verbs=get;list;watch;create;update;patch;delete
@@ -156,8 +159,13 @@ func (r *ImageScanReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *ImageScanReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	maxConcurrency := r.MaxConcurrency
+	if maxConcurrency <= 0 {
+		maxConcurrency = 3
+	}
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&securityv1alpha1.ImageScan{}).
 		Named("imagescan").
+		WithOptions(controller.TypedOptions[reconcile.Request]{MaxConcurrentReconciles: maxConcurrency}).
 		Complete(r)
 }
